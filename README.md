@@ -4,7 +4,7 @@
 
 The dataset is a subset of GDB-13 (a database of nearly 1 billion stable and synthetically accessible organic molecules) composed of all molecules of up to 23 atoms (including 7 heavy atoms C, N, O, and S), totalling 7165 molecules. The Coulomb matrix representation of these molecules and their atomization energies computed similarly to the FHI-AIMS implementation of the Perdew-Burke-Ernzerhof hybrid functional (PBE0) is provided. This dataset features a large variety of molecular structures such as double and triple bonds, cycles, carboxy, cyanide, amide, alcohol and epoxy. The Coulomb matrix is defined as:
 
-[Coulomb_matrix](img/Coulomb_matrix.PNG)
+![Coulomb_matrix](img/Coulomb_matrix.PNG)
 
 1.Input (X)
 
@@ -148,4 +148,5 @@ for name, model in models.items():
 ## References
 
 [QM7 Dataset](http://quantum-machine.org/datasets/)
+
 [StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
