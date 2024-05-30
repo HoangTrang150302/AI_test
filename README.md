@@ -147,6 +147,8 @@ In the [train.py](/Task_2/train.py) file the four models is evaluated using mean
 
 ![MAE](/img/MAE.png)
 
+![MSE](/img/MSE.PNG)
+
 ### Model Comparison Based on Mean Absolute Error
 
 | Model                    | Training MAE (kcal/mol) | Test MAE (kcal/mol) |
@@ -154,7 +156,9 @@ In the [train.py](/Task_2/train.py) file the four models is evaluated using mean
 | Linear Regression        | 19.46   | 144.07   |
 | Support Vector Regression        | 72.99   | 73.34   |
 | Gaussian Process        | 0.00   | 1537.59   |
-| Multilayer Perceptron        | 8.00   | 18.18   |
+| Multilayer Perceptron        | 8.90   | 18.71   |
+
+![Model_comparison_mae](/Task_2/plots/model_comparison_mae.png)
 
 ### Model Comparison Based on Root Mean Squared Error
 
@@ -163,7 +167,9 @@ In the [train.py](/Task_2/train.py) file the four models is evaluated using mean
 | Linear Regression        | 25.47   | 3505.74   |
 | Support Vector Regression        | 122.92   | 124.01   |
 | Gaussian Process        | 0.00   | 1554.03   |
-| Multilayer Perceptron        | 12.17   | 24.88   |
+| Multilayer Perceptron        | 14.48   | 26.38   |
+
+![Model_comparison_rmse](/Task_2/plots/model_comparison_rmse.png)
 
 ## Step 6: Visualization and analysis
 
@@ -172,19 +178,45 @@ For each model, the predicted atomization energies is plotted against the actual
 - Scatter Plot: Each point represents a molecule. The x-axis shows the actual atomization energies, and the y-axis shows the predicted energies.
 - Red Line: The red dashed line represents the ideal case where predicted values perfectly match actual values.
 
+### Linear regression
+
+- Training MAE: 19.46 kcal/mol
+- Test MAE: 144.07 kcal/mol
+
+The Linear Regression model shows a significant increase in error from training to test data. This indicates overfitting, where the model performs well on the training data but poorly on unseen test data. The model may not generalize well due to a lack of complexity to capture the underlying patterns in the data.
+
 ![Linear_Regression_predicted_vs_actual](/Task_2/plots/Linear_Regression_predicted_vs_actual.png)
+
+### Gaussian Process
+
+- Training MAE: 0.00 kcal/mol
+- Test MAE: 1537.59 kcal/mol
+
+The Gaussian Process model has a training MAE of 0.00, which indicates severe overfitting. A training error of 0.00 means that the model has memorized the training data perfectly. The extremely high test MAE shows that the model performs very poorly on unseen data which means the model is overfitting.
 
 ![Gaussian_Process_predicted_vs_actual](/Task_2/plots/Gaussian_Process_predicted_vs_actual.png)
 
+### Multilayer perceptron
+
+- Training MAE: 8.90 kcal/mol
+- Test MAE: 18.71 kcal/mol
+
 ![Multilayer_Perceptron_predicted_vs_actual](/Task_2/plots/Multilayer_Perceptron_predicted_vs_actual.png)
+
+The Multilayer Perceptron (MLP) model has a relatively low training and test MAE, and the difference between the two is modest. This indicates good generalization and that the model is likely capturing the underlying patterns in the data effectively. The MLP seems to be the best-performing model in this comparison.
+
+### Support Vector Regression
+
+- Training MAE: 72.99 kcal/mol
+- Test MAE: 73.34 kcal/mol
 
 ![Support_Vector_Regression_predicted_vs_actual](/Task_2/plots/Support_Vector_Regression_predicted_vs_actual.png)
 
-![Model_comparison_mae](/Task_2/plots/model_comparison_mae.png)
-
-![Model_comparison_rmse](/Task_2/plots/model_comparison_rmse.png)
+The SVR model has very similar errors on both training and test data. This suggests that the model is not overfitting and generalizes well. The relatively high MAE indicates that the model might not be capturing all the underlying patterns, but it is consistent.
 
 ## Advantages and Disadvantages of the author's work
+
+The author's work using neural network to train the model. These are some advantages and disadvantages of the author's work:
 
 ### Advantages
 

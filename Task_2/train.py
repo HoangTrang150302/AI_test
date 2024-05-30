@@ -17,9 +17,7 @@ split = 0
 train_indices = list(range(0, split)) + list(range(split + 1, 5)) # train indices 75%, test 25%
 P = dataset['P'][train_indices].flatten() # convert 2D array to 1D array
 X = dataset['X'][P] # input: select only those rows (molecules) that correspond to the training data
-# print(X.shape)
 T = dataset['T'][0, P] # T contains the corresponding output targets (atomization energies) for the training data()
-# print([0, P])
 
 # Flatten X
 X_flat = X.reshape(X.shape[0], -1) # convert 3D array to 2D array
