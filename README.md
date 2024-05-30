@@ -143,7 +143,7 @@ for name, model in models.items():
 
 ### MSE & MSE
 
-In the [train.py](/Task_2/train.py) file the four models is evaluated using mean absolute error and mean squared error. Mean absolute error (MAE) is a simple, popular and powerful metric to evaluate the accuracy of regression models. It measures the average absolute difference between the predicted values and the actual target values. The smaller MAE value, the better the model's prediction. Mean square error (MSE) is the average of the squared differences between predicted and actual values.
+In the [train.py](/Task_2/train.py) file the four models are evaluated using mean absolute error and mean squared error. Mean absolute error (MAE) is a simple, popular and powerful metric to evaluate the accuracy of regression models. It measures the average absolute difference between the predicted values and the actual target values. The smaller MAE value, the better the model's prediction. Mean square error (MSE) is the average of the squared differences between predicted and actual values.
 
 ![MAE](/img/MAE.png)
 
@@ -203,7 +203,7 @@ The Gaussian Process model has a training MAE of 0.00, which indicates severe ov
 
 ![Multilayer_Perceptron_predicted_vs_actual](/Task_2/plots/Multilayer_Perceptron_predicted_vs_actual.png)
 
-The Multilayer Perceptron (MLP) model has a relatively low training and test MAE, and the difference between the two is modest. This indicates good generalization and that the model is likely capturing the underlying patterns in the data effectively. The MLP seems to be the best-performing model in this comparison.
+The Multilayer Perceptron (MLP) model has a relatively low training and test MAE, and the difference between the two is modest. This indicates good generalization and that the model is likely capturing the underlying patterns in the data effectively. The MLP has the best-performing model among the four models in this application.
 
 ### Support Vector Regression
 
@@ -216,31 +216,15 @@ The SVR model has very similar errors on both training and test data. This sugge
 
 ## Advantages and Disadvantages of the author's work
 
-The author's work using neural network to train the model. These are some advantages and disadvantages of the author's work:
+The author's work using neural network to train the model. These are some advantages and disadvantages of using neural network for this dataset:
 
 ### Advantages
 
-- Ability to Model Complex Relationships: Neural networks can capture complex, non-linear relationships between input features and target variables. This makes them suitable for tasks where simple linear models may fail to provide accurate predictions.
-
-- Automatic Feature Extraction: Neural networks can automatically learn and extract relevant features from raw input data. This reduces the need for manual feature engineering, allowing the model to identify important patterns and interactions.
-
-- Scalability: Neural networks can scale well with large datasets. With sufficient computational resources (such as GPUs), they can handle large volumes of data and complex models, making them suitable for big data applications.
-
-- Flexibility: Neural networks are highly flexible and can be tailored to a wide range of tasks by adjusting their architecture (e.g., number of layers, number of neurons per layer, activation functions). This allows for customization based on the specific needs of the problem.
-
-- State-of-the-Art Performance: Neural networks have been shown to achieve state-of-the-art performance on various tasks, particularly in fields such as image recognition, natural language processing, and speech recognition.
+Neural networks can capture complex, non-linear relationships between input features and target variables. This makes them suitable for tasks where simple linear models may fail to provide accurate predictions. It can automatically learn and extract relevant features from raw input data. This reduces the need for manual feature engineering, allowing the model to identify important patterns and interactions. Neural networks scales well with large datasets. With sufficient computational resources (such as GPUs), they can handle large volumes of data and complex models, making them suitable for big data applications. It is highly flexible and can be tailored to a wide range of tasks by adjusting their architecture such as number of layers, number of neurons per layer or activation functions. This allows for customization based on the specific needs of the problem. Finally, neural networks have been shown to achieve state-of-the-art performance on various tasks, particularly in fields such as image recognition, natural language processing, and speech recognition.
 
 ### Disadvantages
 
-- Computationally Intensive: Training neural networks, especially deep networks, can be computationally intensive and time-consuming. They require significant computational resources, such as powerful GPUs, and can take a long time to train.
-
-- Require Large Datasets: Neural networks often require large amounts of training data to generalize well and avoid overfitting. In cases where data is limited, simpler models may perform better.
-
-- Complexity in Hyperparameter Tuning: Neural networks have many hyperparameters (e.g., learning rate, batch size, number of layers, number of neurons per layer) that need to be carefully tuned to achieve optimal performance. This tuning process can be complex and time-consuming.
-
-- Risk of Overfitting: Neural networks are prone to overfitting, especially if the model is too complex for the amount of training data available. Regularization techniques and careful model validation are necessary to mitigate this risk.
-
-- Interpretability: Neural networks are often considered "black boxes" because their decision-making process is not easily interpretable. Understanding why a neural network makes a certain prediction can be challenging, which may be a drawback in applications where interpretability is crucial.
+Training neural networks (NN), especially deep networks, can be computationally intensive and time-consuming. They require significant computational resources, such as powerful GPUs, and can take a long time to train. Specifically, the author's work using neural network can take up to two days for training. Neural networks have many hyperparameters such as learning rate, batch size, number of layers, number of neurons per layer that need to be carefully tuned to achieve optimal performance. This tuning process can be complex and time-consuming. Neural networks are prone to overfitting, especially if the model is too complex for the amount of training data available. Regularization techniques and careful model validation are necessary to mitigate this risk. NN are often considered "black boxes" because their decision-making process is not easily interpretable. Understanding why a neural network makes a certain prediction can be challenging, which may be a drawback in applications where interpretability is crucial.
 
 ## References
 
@@ -249,3 +233,7 @@ The author's work using neural network to train the model. These are some advant
 2.[StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
 
 3.[Understanding Mean Absolute Error (MAE) in Regression: A Practical Guide](https://medium.com/@m.waqar.ahmed/understanding-mean-absolute-error-mae-in-regression-a-practical-guide-26e80ebb97df)
+
+## Github repository
+
+Github repository of this code and documentary: [Github repository](https://github.com/HoangTrang150302/AI_test)
