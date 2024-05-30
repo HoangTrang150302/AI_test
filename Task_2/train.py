@@ -1,19 +1,10 @@
-# Train
-import sys, os, pickle, sys, copy, scipy, scipy.io
-import numpy as np
+import os, pickle, sys, copy, scipy, scipy.io
 from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.preprocessing import StandardScaler
-
-# Parameters
-seed  = 3453
-mb    = 25     # size of the minibatch
-hist  = 0.1    # fraction of the history to be remembered
-
-np.random.seed(seed) # Set random seed for reproducibility
 
 # Load data
 if not os.path.exists('qm7.mat'):
@@ -58,7 +49,7 @@ for name, model in models.items():
     results[name] = mae
     print(f'{name} Mean Absolute Error: {mae}')
 
-# # Save models
-# for name, model in models.items():
-#     with open(f'{name.replace(" ", "_")}_model.pkl', 'wb') as f:
-#         pickle.dump(model, f)
+# Save models
+for name, model in models.items():
+    with open(f'{name.replace(" ", "_")}_model.pkl', 'wb') as f:
+        pickle.dump(model, f)
