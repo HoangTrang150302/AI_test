@@ -1,0 +1,495 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Documentation}
+\author{Trang Hoang}
+\maketitle
+
+\section{Documentation}\label{documentation}
+
+\subsection{Step 1: Understand the
+dataset}\label{step-1-understand-the-dataset}
+
+The dataset is a subset of GDB-13 (a database of nearly 1 billion stable
+and synthetically accessible organic molecules) composed of all
+molecules of up to 23 atoms (including 7 heavy atoms C, N, O, and S),
+totaling 7165 molecules. The Coulomb matrix representation of these
+molecules and their atomization energies computed similarly to the
+FHI-AIMS implementation of the Perdew-Burke-Ernzerhof hybrid functional
+(PBE0) is provided. This dataset features various molecular structures
+such as double and triple bonds, cycles, carboxy, cyanide, amide,
+alcohol, and epoxy. The Coulomb matrix is defined as:
+
+\begin{figure}
+\centering
+\includegraphics{https://github.com/HoangTrang150302/AI_test/assets/73728218/57d27f8e-5c0a-4344-ad24-20c2475eef7f}
+\caption{Coulomb matrix}
+\end{figure}
+
+1.Input (X)
+
+\begin{itemize}
+\item
+  Coulomb matrices representing the molecular structures, shape 7165 x
+  23 x 23
+\item
+  Each Coulomb matrix is a 23 x 23 array representing a molecular
+  structure
+\item
+  There are a total of 7165 matrices in the data set
+\end{itemize}
+
+2.Output (T)
+
+\begin{itemize}
+\item
+  Shape: 7165
+\item
+  Each value in T represents the atomization energy of a corresponding
+  molecule
+\end{itemize}
+
+3.Cross-validation splits (P)
+
+\begin{itemize}
+\item
+  Shape: 5 x 1433
+\item
+  Each row in the array represents a specific split
+\item
+  5 rows: 5 different cross-validation splits, each row contains 1433
+  indices
+\item
+  The P array is to partition the dataset into training and validation
+  sets according to predefined splits
+\end{itemize}
+
+4.Atomic charges (Z)
+
+\begin{itemize}
+\item
+  Shape: 7165 x 23
+\item
+  Each row corresponds to one molecule
+\item
+  Each entry in a row represents the atomic charge of an atom in the
+  molecule
+\end{itemize}
+
+5.Cartesian Coordinates (R)
+
+\begin{itemize}
+\item
+  Shape: 7165 x 23 x 3
+\item
+  Each row corresponds to one molecule
+\item
+  Each subarray within a row contains the 3D coordinates for each atom
+\end{itemize}
+
+\subsection{Step 2: Data preprocessing}\label{step-2-data-preprocessing}
+
+\subsubsection{Load data}\label{load-data}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Load data}
+\ControlFlowTok{if} \KeywordTok{not}\NormalTok{ os.path.exists(}\StringTok{\textquotesingle{}qm7.mat\textquotesingle{}}\NormalTok{):}
+\NormalTok{    os.system(}\StringTok{\textquotesingle{}wget http://www.quantum{-}machine.org/data/qm7.mat\textquotesingle{}}\NormalTok{)}
+\NormalTok{dataset }\OperatorTok{=}\NormalTok{ scipy.io.loadmat(}\StringTok{\textquotesingle{}qm7.mat\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Extract training data}\label{extract-training-data}
+
+The P two-dimensional array contains the cross-validation split data for
+the training and testing set. Four rows in the array will be used for
+training and the remaining row will be used for testing which make 75\%
+of the data for training and 25\% of the data for testing.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Test split for cross{-}validation (between 0 and 5)}
+\NormalTok{split }\OperatorTok{=} \BuiltInTok{int}\NormalTok{(sys.argv[}\DecValTok{1}\NormalTok{]) }
+
+\CommentTok{\# Extract training data}
+\CommentTok{\# Train indices 75\%, test 25\%}
+\NormalTok{train\_indices }\OperatorTok{=} \BuiltInTok{list}\NormalTok{(}\BuiltInTok{range}\NormalTok{(}\DecValTok{0}\NormalTok{, split)) }\OperatorTok{+} \BuiltInTok{list}\NormalTok{(}\BuiltInTok{range}\NormalTok{(split }\OperatorTok{+} \DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{)) }
+
+\CommentTok{\# Convert 2D array to 1D array}
+\NormalTok{P }\OperatorTok{=}\NormalTok{ dataset[}\StringTok{\textquotesingle{}P\textquotesingle{}}\NormalTok{][train\_indices].flatten() }
+
+\CommentTok{\# Input: select only those rows (molecules) that correspond to the training data}
+\NormalTok{X }\OperatorTok{=}\NormalTok{ dataset[}\StringTok{\textquotesingle{}X\textquotesingle{}}\NormalTok{][P] }
+
+\CommentTok{\# T contains the corresponding output targets (atomization energies) for the training data}
+\NormalTok{T }\OperatorTok{=}\NormalTok{ dataset[}\StringTok{\textquotesingle{}T\textquotesingle{}}\NormalTok{][}\DecValTok{0}\NormalTok{, P] }
+
+\CommentTok{\# Flatten X}
+\NormalTok{X\_flat }\OperatorTok{=}\NormalTok{ X.reshape(X.shape[}\DecValTok{0}\NormalTok{], }\OperatorTok{{-}}\DecValTok{1}\NormalTok{) }\CommentTok{\# convert 3D array to 2D array}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{Standardize the data}\label{standardize-the-data}
+
+Using the StandardScaler() class from the scikit-learn library.
+StandardScaler is a class in scikit-learn that standardizes features by
+removing the mean and scaling to unit variance. Standardization is
+important because many machine learning algorithms perform better or
+converge faster when the input features are scaled. The standard score
+of a sample x is calculated as: \texttt{z\ =\ (x\ -\ u)\ /\ s} where u
+is the mean of the training samples or zero if with\_mean=False, and s
+is the standard deviation of the training samples or one if
+with\_std=False.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# import statement}
+\ImportTok{from}\NormalTok{ sklearn.preprocessing }\ImportTok{import}\NormalTok{ StandardScaler}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{scaler }\OperatorTok{=}\NormalTok{ StandardScaler()}
+\NormalTok{X\_flat }\OperatorTok{=}\NormalTok{ scaler.fit\_transform(X\_flat)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Step 3: Implement Machine Learning
+Model}\label{step-3-implement-machine-learning-model}
+
+\subsubsection{Define and train the
+model}\label{define-and-train-the-model}
+
+This step aims to create a set of diverse models to be trained and
+evaluated on the dataset. Different models are used to compare their
+performance and select the best one. This approach used merely the
+traditional Machine Learning method including Linear Regression, Support
+Vector Regression, Gaussian Process, and Multilayer Perceptron. These
+four models are provided by the scikit-learn library.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# import statement}
+\ImportTok{from}\NormalTok{ sklearn.linear\_model }\ImportTok{import}\NormalTok{ LinearRegression}
+\ImportTok{from}\NormalTok{ sklearn.svm }\ImportTok{import}\NormalTok{ SVR}
+\ImportTok{from}\NormalTok{ sklearn.gaussian\_process }\ImportTok{import}\NormalTok{ GaussianProcessRegressor}
+\ImportTok{from}\NormalTok{ sklearn.neural\_network }\ImportTok{import}\NormalTok{ MLPRegressor}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  Linear regression models the relationship between the dependent
+  variable (target) and one or more independent variables (features) by
+  fitting a linear equation to the observed data.
+\item
+  SVR is a type of Support Vector Machine (SVM) used for regression
+  tasks. It tries to fit the best line within a threshold value
+  (epsilon) that maximizes the margin between data points.
+\item
+  Gaussian Process Regression is a non-parametric, Bayesian approach to
+  regression that provides a distribution over functions. It is
+  particularly useful for problems where the data is noisy or the
+  underlying function is complex.
+\item
+  MLP is a type of feedforward artificial neural network. It consists of
+  multiple layers of neurons, including an input layer, one or more
+  hidden layers, and an output layer. Each neuron in a layer is
+  connected to every neuron in the subsequent layer.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Define and train models}
+\NormalTok{models }\OperatorTok{=}\NormalTok{ \{}
+    \StringTok{"Linear Regression"}\NormalTok{: LinearRegression(),}
+    \StringTok{"Support Vector Regression"}\NormalTok{: SVR(),}
+    \StringTok{"Gaussian Process"}\NormalTok{: GaussianProcessRegressor(),}
+    \StringTok{"Multilayer Perceptron"}\NormalTok{: MLPRegressor(hidden\_layer\_sizes}\OperatorTok{=}\NormalTok{(}\DecValTok{400}\NormalTok{, }\DecValTok{100}\NormalTok{), max\_iter}\OperatorTok{=}\DecValTok{1000}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Step 4: Model training}\label{step-4-model-training}
+
+The loop iterates over the dictionary of models, trains each model,
+makes predictions, and evaluates the performance using Mean Absolute
+Error (MAE).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ name, model }\KeywordTok{in}\NormalTok{ models.items():}
+    \CommentTok{\# Train the model}
+\NormalTok{    model.fit(X\_flat, T) }\CommentTok{\# X\_flat: input, T: output}
+    \CommentTok{\# Predict}
+\NormalTok{    predictions }\OperatorTok{=}\NormalTok{ model.predict(X\_flat)}
+    \CommentTok{\# Calculate Mean Absolute Error}
+\NormalTok{    mae }\OperatorTok{=}\NormalTok{ mean\_absolute\_error(T, predictions)}
+\NormalTok{    results[name] }\OperatorTok{=}\NormalTok{ mae}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f\textquotesingle{}}\SpecialCharTok{\{}\NormalTok{name}\SpecialCharTok{\}}\SpecialStringTok{ Mean Absolute Error: }\SpecialCharTok{\{}\NormalTok{mae}\SpecialCharTok{\}}\SpecialStringTok{\textquotesingle{}}\NormalTok{)}
+
+\CommentTok{\# Save models}
+\ControlFlowTok{for}\NormalTok{ name, model }\KeywordTok{in}\NormalTok{ models.items():}
+    \ControlFlowTok{with} \BuiltInTok{open}\NormalTok{(}\SpecialStringTok{f\textquotesingle{}}\SpecialCharTok{\{}\NormalTok{name}\SpecialCharTok{.}\NormalTok{replace(}\StringTok{" "}\NormalTok{, }\StringTok{"\_"}\NormalTok{)}\SpecialCharTok{\}}\SpecialStringTok{\_model.pkl\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}wb\textquotesingle{}}\NormalTok{) }\ImportTok{as}\NormalTok{ f:}
+\NormalTok{        pickle.dump(model, f)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Step 5: Model evaluation}\label{step-5-model-evaluation}
+
+\subsubsection{MSE \& MSE}\label{mse-mse}
+
+In the \href{/Task_2/train.py}{train.py} file the four models are
+evaluated using mean absolute error and mean squared error. Mean
+absolute error (MAE) is a simple, popular and powerful metric to
+evaluate the accuracy of regression models. It measures the average
+absolute difference between the predicted values and the actual target
+values. The smaller MAE value, the better the model's prediction. Mean
+square error (MSE) is the average of the squared differences between
+predicted and actual values.
+
+\begin{figure}
+\centering
+\includegraphics{https://github.com/HoangTrang150302/AI_test/assets/73728218/11e49d66-a7ed-47ac-9a9d-347b229c9983}
+\caption{MAE}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{https://github.com/HoangTrang150302/AI_test/assets/73728218/b3a4e0c3-6d3f-43ce-a417-88d7b03a9fd7}
+\caption{MSE}
+\end{figure}
+
+\subsubsection{Model Comparison Based on Mean Absolute
+Error}\label{model-comparison-based-on-mean-absolute-error}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3562}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3425}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3014}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Training MAE (kcal/mol)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Test MAE (kcal/mol)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Linear Regression & 19.46 & 144.07 \\
+Support Vector Regression & 72.99 & 73.34 \\
+Gaussian Process & 0.00 & 1537.59 \\
+Multilayer Perceptron & 8.90 & 18.71 \\
+\end{longtable}
+
+\begin{figure}
+\centering
+\includegraphics{https://github.com/HoangTrang150302/AI_test/assets/73728218/896d5a1a-cd12-4de1-af16-3b5be8ce23fc}
+\caption{Model comparison mae}
+\end{figure}
+
+\subsubsection{Model Comparison Based on Root Mean Squared
+Error}\label{model-comparison-based-on-root-mean-squared-error}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3514}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3514}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.2973}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Training RMSE (kcal/mol)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Test RMSE (kcal/mol)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Linear Regression & 25.47 & 3505.74 \\
+Support Vector Regression & 122.92 & 124.01 \\
+Gaussian Process & 0.00 & 1554.03 \\
+Multilayer Perceptron & 14.48 & 26.38 \\
+\end{longtable}
+
+\begin{figure}
+\centering
+\includegraphics{https://github.com/HoangTrang150302/AI_test/assets/73728218/c1a06f21-ad60-420b-b28c-f907fceac9d1}
+\caption{Model comparison rmse}
+\end{figure}
+
+\subsection{Step 6: Visualization and
+analysis}\label{step-6-visualization-and-analysis}
+
+For each model, the predicted atomization energies are plotted against
+the actual atomization energies:
+
+\begin{itemize}
+\tightlist
+\item
+  Scatter Plot: Each point represents a molecule. The x-axis shows the
+  actual atomization energies and the y-axis shows the predicted
+  energies.
+\item
+  Red Line: The red dashed line represents the ideal case where
+  predicted values perfectly match actual values.
+\end{itemize}
+
+\subsubsection{Linear regression}\label{linear-regression}
+
+\begin{itemize}
+\tightlist
+\item
+  Training MAE: 19.46 kcal/mol
+\item
+  Test MAE: 144.07 kcal/mol
+\end{itemize}
+
+The Linear Regression model shows a significant increase in error from
+training to test data. This indicates overfitting, where the model
+performs well on the training data but poorly on unseen test data. The
+model may not generalize well due to a lack of complexity to capture the
+underlying patterns in the data.
+
+\begin{figure}
+\centering
+\includegraphics{https://github.com/HoangTrang150302/AI_test/assets/73728218/ab5b929a-1561-41d6-aa52-8939c187af23}
+\caption{Linear Regression predicted vs actual}
+\end{figure}
+
+\subsubsection{Gaussian Process}\label{gaussian-process}
+
+\begin{itemize}
+\tightlist
+\item
+  Training MAE: 0.00 kcal/mol
+\item
+  Test MAE: 1537.59 kcal/mol
+\end{itemize}
+
+The Gaussian Process model has a training MAE of 0.00, which indicates
+severe overfitting. A training error of 0.00 means that the model has
+memorized the training data perfectly. The extremely high test MAE shows
+that the model performs very poorly on unseen data which means the model
+is overfitting.
+
+\begin{figure}
+\centering
+\includegraphics{https://github.com/HoangTrang150302/AI_test/assets/73728218/914344ff-51e9-4e2b-87a9-0dc03fad7609}
+\caption{Gaussian Process predicted vs actual}
+\end{figure}
+
+\subsubsection{Multilayer perceptron}\label{multilayer-perceptron}
+
+\begin{itemize}
+\tightlist
+\item
+  Training MAE: 8.90 kcal/mol
+\item
+  Test MAE: 18.71 kcal/mol
+\end{itemize}
+
+The Multilayer Perceptron (MLP) model has a relatively low training and
+test MAE, and the difference between the two is modest. This indicates
+good generalization and that the model is likely capturing the
+underlying patterns in the data effectively. The MLP has the
+best-performing model among the four models in this application.
+
+\begin{figure}
+\centering
+\includegraphics{https://github.com/HoangTrang150302/AI_test/assets/73728218/81529f87-64b9-4ec5-b171-059493c41855}
+\caption{Multilayer Perceptron predicted vs actual}
+\end{figure}
+
+\subsubsection{Support Vector
+Regression}\label{support-vector-regression}
+
+\begin{itemize}
+\tightlist
+\item
+  Training MAE: 72.99 kcal/mol
+\item
+  Test MAE: 73.34 kcal/mol
+\end{itemize}
+
+The SVR model has very similar errors in both training and test data.
+This suggests that the model is not overfitting and generalizes well.
+The relatively high MAE indicates that the model might not be capturing
+all the underlying patterns, but it is consistent.
+
+\begin{figure}
+\centering
+\includegraphics{https://github.com/HoangTrang150302/AI_test/assets/73728218/9830bcc4-2092-4e41-93e1-8d14a226da3d}
+\caption{Support Vector Regression predicted vs actual}
+\end{figure}
+
+\subsection{Advantages and Disadvantages of the author's
+work}\label{advantages-and-disadvantages-of-the-authors-work}
+
+The author's work uses neural network to train the model. These are some
+advantages and disadvantages of using neural networks for this dataset:
+
+\subsubsection{Advantages}\label{advantages}
+
+Neural networks can capture complex, non-linear relationships between
+input features and target variables. This makes them suitable for tasks
+where simple linear models may fail to provide accurate predictions. It
+can automatically learn and extract relevant features from raw input
+data. This reduces the need for manual feature engineering, allowing the
+model to identify important patterns and interactions. Neural networks
+scale well with large datasets. With sufficient computational resources
+(such as GPUs), they can handle large volumes of data and complex
+models, making them suitable for big data applications. It is highly
+flexible and can be tailored to a wide range of tasks by adjusting its
+architecture such as the number of layers, number of neurons per layer,
+or activation functions. This allows for customization based on the
+specific needs of the problem. Finally, neural networks have been shown
+to achieve state-of-the-art performance on various tasks, particularly
+in fields such as image recognition, natural language processing, and
+speech recognition.
+
+\subsubsection{Disadvantages}\label{disadvantages}
+
+Training neural networks (NN), especially deep networks, can be
+computationally intensive and time-consuming. They require significant
+computational resources, such as powerful GPUs, and can take a long time
+to train. Specifically, the author's work using a neural network can
+take up to two days for training. Neural networks have many
+hyperparameters such as learning rate, batch size, number of layers, and
+number of neurons per layer that need to be carefully tuned to achieve
+optimal performance. This tuning process can be complex and
+time-consuming. Neural networks are prone to overfitting, especially if
+the model is too complex for the amount of training data available.
+Regularization techniques and careful model validation are necessary to
+mitigate this risk. NN are often considered ``black boxes'' because
+their decision-making process is not easily interpretable. Understanding
+why a neural network makes a certain prediction can be challenging,
+which may be a drawback in applications where interpretability is
+crucial.
+
+\subsection{References}\label{references}
+
+1.\href{http://quantum-machine.org/datasets/}{QM7 Dataset}
+
+2.\href{https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html}{StandardScaler}
+
+3.\href{https://medium.com/@m.waqar.ahmed/understanding-mean-absolute-error-mae-in-regression-a-practical-guide-26e80ebb97df}{Understanding
+Mean Absolute Error (MAE) in Regression: A Practical Guide}
+
+\subsection{Github repository}\label{github-repository}
+
+Github repository of this code and documentary:
+\href{https://github.com/HoangTrang150302/AI_test}{Github repository}
+
+\end{document}
