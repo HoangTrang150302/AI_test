@@ -6,6 +6,9 @@ The dataset is a subset of GDB-13 (a database of nearly 1 billion stable and syn
 
 ![Coulomb_matrix](img/Coulomb_matrix.PNG)
 
+![image](https://github.com/HoangTrang150302/AI_test/assets/73728218/57d27f8e-5c0a-4344-ad24-20c2475eef7f)
+
+
 1.Input (X)
 
 - Coulomb matrices representing the molecular structures, shape 7165 x 23 x 23
