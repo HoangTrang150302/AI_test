@@ -4,7 +4,7 @@
 
 The dataset is a subset of GDB-13 (a database of nearly 1 billion stable and synthetically accessible organic molecules) composed of all molecules of up to 23 atoms (including 7 heavy atoms C, N, O, and S), totaling 7165 molecules. The Coulomb matrix representation of these molecules and their atomization energies computed similarly to the FHI-AIMS implementation of the Perdew-Burke-Ernzerhof hybrid functional (PBE0) is provided. This dataset features various molecular structures such as double and triple bonds, cycles, carboxy, cyanide, amide, alcohol, and epoxy. The Coulomb matrix is defined as:
 
-![image](https://github.com/HoangTrang150302/AI_test/assets/73728218/57d27f8e-5c0a-4344-ad24-20c2475eef7f)
+![Coulomb matrix](https://github.com/HoangTrang150302/AI_test/assets/73728218/57d27f8e-5c0a-4344-ad24-20c2475eef7f)
 
 1.Input (X)
 
@@ -63,12 +63,21 @@ dataset = scipy.io.loadmat('qm7.mat')
 The P two-dimensional array contains the cross-validation split data for the training and testing set. Four rows in the array will be used for training and the remaining row will be used for testing which make 75% of the data for training and 25% of the data for testing.
 
 ```python
+# Test split for cross-validation (between 0 and 5)
+split = int(sys.argv[1]) 
+
 # Extract training data
-split = int(sys.argv[1]) # test split for cross-validation (between 0 and 5)
-train_indices = list(range(0, split)) + list(range(split + 1, 5)) # train indices 75%, test 25%
-P = dataset['P'][train_indices].flatten() # convert 2D array to 1D array
-X = dataset['X'][P] # input: select only those rows (molecules) that correspond to the training data
-T = dataset['T'][0, P] # T contains the corresponding output targets (atomization energies) for the training data
+# Train indices 75%, test 25%
+train_indices = list(range(0, split)) + list(range(split + 1, 5)) 
+
+# Convert 2D array to 1D array
+P = dataset['P'][train_indices].flatten() 
+
+# Input: select only those rows (molecules) that correspond to the training data
+X = dataset['X'][P] 
+
+# T contains the corresponding output targets (atomization energies) for the training data
+T = dataset['T'][0, P] 
 
 # Flatten X
 X_flat = X.reshape(X.shape[0], -1) # convert 3D array to 2D array
@@ -149,7 +158,6 @@ In the [train.py](/Task_2/train.py) file the four models are evaluated using mea
 
 ![MSE](https://github.com/HoangTrang150302/AI_test/assets/73728218/b3a4e0c3-6d3f-43ce-a417-88d7b03a9fd7)
 
-
 ### Model Comparison Based on Mean Absolute Error
 
 | Model                    | Training MAE (kcal/mol) | Test MAE (kcal/mol) |
@@ -159,7 +167,7 @@ In the [train.py](/Task_2/train.py) file the four models are evaluated using mea
 | Gaussian Process        | 0.00   | 1537.59   |
 | Multilayer Perceptron        | 8.90   | 18.71   |
 
-![model_comparison_mae](https://github.com/HoangTrang150302/AI_test/assets/73728218/896d5a1a-cd12-4de1-af16-3b5be8ce23fc)
+![Model comparison mae](https://github.com/HoangTrang150302/AI_test/assets/73728218/896d5a1a-cd12-4de1-af16-3b5be8ce23fc)
 
 ### Model Comparison Based on Root Mean Squared Error
 
@@ -170,7 +178,7 @@ In the [train.py](/Task_2/train.py) file the four models are evaluated using mea
 | Gaussian Process        | 0.00   | 1554.03   |
 | Multilayer Perceptron        | 14.48   | 26.38   |
 
-![model_comparison_rmse](https://github.com/HoangTrang150302/AI_test/assets/73728218/c1a06f21-ad60-420b-b28c-f907fceac9d1)
+![Model comparison rmse](https://github.com/HoangTrang150302/AI_test/assets/73728218/c1a06f21-ad60-420b-b28c-f907fceac9d1)
 
 ## Step 6: Visualization and analysis
 
@@ -186,7 +194,7 @@ For each model, the predicted atomization energies are plotted against the actua
 
 The Linear Regression model shows a significant increase in error from training to test data. This indicates overfitting, where the model performs well on the training data but poorly on unseen test data. The model may not generalize well due to a lack of complexity to capture the underlying patterns in the data.
 
-![Linear_Regression_predicted_vs_actual](https://github.com/HoangTrang150302/AI_test/assets/73728218/ab5b929a-1561-41d6-aa52-8939c187af23)
+![Linear Regression predicted vs actual](https://github.com/HoangTrang150302/AI_test/assets/73728218/ab5b929a-1561-41d6-aa52-8939c187af23)
 
 ### Gaussian Process
 
@@ -195,25 +203,25 @@ The Linear Regression model shows a significant increase in error from training 
 
 The Gaussian Process model has a training MAE of 0.00, which indicates severe overfitting. A training error of 0.00 means that the model has memorized the training data perfectly. The extremely high test MAE shows that the model performs very poorly on unseen data which means the model is overfitting.
 
-![Gaussian_Process_predicted_vs_actual](https://github.com/HoangTrang150302/AI_test/assets/73728218/914344ff-51e9-4e2b-87a9-0dc03fad7609)
+![Gaussian Process predicted vs actual](https://github.com/HoangTrang150302/AI_test/assets/73728218/914344ff-51e9-4e2b-87a9-0dc03fad7609)
 
 ### Multilayer perceptron
 
 - Training MAE: 8.90 kcal/mol
 - Test MAE: 18.71 kcal/mol
 
-![Multilayer_Perceptron_predicted_vs_actual](https://github.com/HoangTrang150302/AI_test/assets/73728218/81529f87-64b9-4ec5-b171-059493c41855)
-
 The Multilayer Perceptron (MLP) model has a relatively low training and test MAE, and the difference between the two is modest. This indicates good generalization and that the model is likely capturing the underlying patterns in the data effectively. The MLP has the best-performing model among the four models in this application.
+
+![Multilayer Perceptron predicted vs actual](https://github.com/HoangTrang150302/AI_test/assets/73728218/81529f87-64b9-4ec5-b171-059493c41855)
 
 ### Support Vector Regression
 
 - Training MAE: 72.99 kcal/mol
 - Test MAE: 73.34 kcal/mol
 
-![Support_Vector_Regression_predicted_vs_actual](https://github.com/HoangTrang150302/AI_test/assets/73728218/9830bcc4-2092-4e41-93e1-8d14a226da3d)
-
 The SVR model has very similar errors in both training and test data. This suggests that the model is not overfitting and generalizes well. The relatively high MAE indicates that the model might not be capturing all the underlying patterns, but it is consistent.
+
+![Support Vector Regression predicted vs actual](https://github.com/HoangTrang150302/AI_test/assets/73728218/9830bcc4-2092-4e41-93e1-8d14a226da3d)
 
 ## Advantages and Disadvantages of the author's work
 
