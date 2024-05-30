@@ -139,11 +139,11 @@ for name, model in models.items():
         pickle.dump(model, f)
 ```
 
-## Step 6: Model evaluation
+## Step 5: Model evaluation
 
 ### MSE & MSE
 
-In the [train.py](/Task_2/train.py) file the 4 models is evaluated using mean absolute error and mean squared error. Mean absolute error (MAE) is a simple, popular and powerful metric to evaluate the accuracy of regression models. It measures the average absolute difference between the predicted values and the actual target values. The smaller MAE value, the better the model's prediction. Mean square error (MSE) is the average of the squared differences between predicted and actual values.
+In the [train.py](/Task_2/train.py) file the four models is evaluated using mean absolute error and mean squared error. Mean absolute error (MAE) is a simple, popular and powerful metric to evaluate the accuracy of regression models. It measures the average absolute difference between the predicted values and the actual target values. The smaller MAE value, the better the model's prediction. Mean square error (MSE) is the average of the squared differences between predicted and actual values.
 
 ![MAE](/img/MAE.png)
 
@@ -164,13 +164,25 @@ In the [train.py](/Task_2/train.py) file the 4 models is evaluated using mean ab
 | Support Vector Regression        | 122.92   | 124.01   |
 | Gaussian Process        | 0.00   | 1554.03   |
 | Multilayer Perceptron        | 12.17   | 24.88   |
- 
-## Step 5: Visualization and analysis
+
+## Step 6: Visualization and analysis
 
 For each model, the predicted atomization energies is plotted against the actual atomization energies:
 
 - Scatter Plot: Each point represents a molecule. The x-axis shows the actual atomization energies, and the y-axis shows the predicted energies.
 - Red Line: The red dashed line represents the ideal case where predicted values perfectly match actual values.
+
+![Linear_Regression_predicted_vs_actual](/Task_2/plots/Linear_Regression_predicted_vs_actual.png)
+
+![Gaussian_Process_predicted_vs_actual](/Task_2/plots/Gaussian_Process_predicted_vs_actual.png)
+
+![Multilayer_Perceptron_predicted_vs_actual](/Task_2/plots/Multilayer_Perceptron_predicted_vs_actual.png)
+
+![Support_Vector_Regression_predicted_vs_actual](/Task_2/plots/Support_Vector_Regression_predicted_vs_actual.png)
+
+![Model_comparison_mae](/Task_2/plots/model_comparison_mae.png)
+
+![Model_comparison_rmse](/Task_2/plots/model_comparison_rmse.png)
 
 ## Advantages and Disadvantages of the author's work
 
@@ -200,8 +212,8 @@ For each model, the predicted atomization energies is plotted against the actual
 
 ## References
 
-[QM7 Dataset](http://quantum-machine.org/datasets/)
+1.[QM7 Dataset](http://quantum-machine.org/datasets/)
 
-[StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
+2.[StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
 
-[Understanding Mean Absolute Error (MAE) in Regression: A Practical Guide](https://medium.com/@m.waqar.ahmed/understanding-mean-absolute-error-mae-in-regression-a-practical-guide-26e80ebb97df)
+3.[Understanding Mean Absolute Error (MAE) in Regression: A Practical Guide](https://medium.com/@m.waqar.ahmed/understanding-mean-absolute-error-mae-in-regression-a-practical-guide-26e80ebb97df)
